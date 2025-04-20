@@ -3,12 +3,35 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
 
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
+
   css: [
     // SCSS file in the project
     "~/assets/style/main.scss", // you should add main.scss somewhere in your app
   ],
 
-  modules: ["@vite-pwa/nuxt"],
+  vite: {
+    optimizeDeps: {
+      include: ['mapbox-gl'],
+    },
+    server: {
+      allowedHosts: ['a862-195-49-149-22.ngrok-free.app']
+    }
+  },  
+
+  modules: ["@vite-pwa/nuxt", '@vueuse/nuxt'],
+
+  runtimeConfig: {
+    public: {
+      mapboxToken: process.env.MAPBOX_PERSONAL,
+    }
+  },
+
+  mapbox: {
+    accessToken: process.env.MAPBOX_PERSONAL
+  },
 
   pwa: {
     manifest: {

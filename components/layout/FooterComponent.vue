@@ -1,5 +1,5 @@
 <template>
-<footer class="footer elevation-dark-4">
+<footer ref="footer" :class="['footer', 'elevation-dark-4', {'footer--no-margin': currentRoute === 'map'}]">
     <div class="container">
         <div class="footer__top">
             <div class="footer__top__logo img-wrap img-wrap--contain">
@@ -12,13 +12,13 @@
             <p class="title-medium">Київ, вул. Покровська 9а, 01001</p>
         </div>
         <div class="footer__socials">
-            <div class="btn--icon img-wrap">
+            <div class="btn--icon">
                 <img src="/public/img/svg/icons/insta_logo.svg" alt="instagram">
             </div>
-            <div class="btn--icon img-wrap">
+            <div class="btn--icon">
                 <img src="/public/img/svg/icons/twitter_logo.svg" alt="instagram">
             </div>
-            <div class="btn--icon img-wrap">
+            <div class="btn--icon">
                 <img src="/public/img/svg/icons/yt_logo.svg" alt="instagram">
             </div>
         </div>
@@ -30,11 +30,17 @@
 </template>
 
 <script setup>
+const router = useRouter()
+const currentRoute = ref(router.currentRoute.value.name);
 
+watch(router.currentRoute, () => {
+    currentRoute.value = router.currentRoute.value.name;
+})
 </script>
 
 <style lang="scss">
 .footer {
+    margin-top: 2rem;
     background-color: #FFFFFF;
     padding: 4rem 0;
     border-radius: 1.6rem 1.6rem 0 0;
@@ -62,6 +68,10 @@
         border-top: 0.2rem dashed #D9D9D9;
         padding-top: 2.8rem;
         color: #6A6A6A;
+    }
+    &--no-margin {
+        margin-top: 0;
+        position: relative;
     }
 }
 </style>
