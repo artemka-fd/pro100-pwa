@@ -1,7 +1,7 @@
 <template>
 <div class="reservation-card">
     <div class="reservation-card__top">
-        <div class="reservation-card__top-image img-wrap img-wrap--contain">
+        <div class="reservation-card__top-image img-wrap img-wrap--cover">
             <img :src="station.imageUrl" :alt="`${station.name} Logo`">
         </div>
         <p class="title-medium">{{ station.name }}</p>
@@ -53,7 +53,7 @@ const props = defineProps({
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .reservation-card {
     background-color: var(--neutrals-100);
     padding: 1.6rem;
@@ -72,6 +72,12 @@ const props = defineProps({
             border-radius: var(--round-4);
             border: 0.88px solid var(--neutrals-400);
             width: 3.2rem;
+            height: 3.2rem;
+        }
+        &__image {
+            .title-medium {
+                margin-top: 0;
+            }
         }
     }
     &__info {
@@ -82,12 +88,18 @@ const props = defineProps({
         p {
             margin: 0;
         }
+        @media screen and (min-width: 768px) {
+            margin-bottom: 0.8rem;
+        }
     }
     &__btns {
         display: flex;
         gap: 0.8rem;
         .btn {
             flex-grow: 1;
+        }
+        @media screen and (min-width: 768px) {
+            margin-top: 1.6rem;
         }
     }
     &--disabled {

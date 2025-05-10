@@ -1,7 +1,7 @@
 <template>
 <section class="reservations">
     <div class="container">
-        <div class="reservations__heading">
+        <div class="reservations__heading desktop--hide">
             <div class="btn btn--transparent" @click="handleBackBtn">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.5 15L7.5 10L12.5 5" stroke="#3422F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -10,19 +10,22 @@
             </div>
             <p class="body-large">Мої бронювання</p>
         </div>
-        <div class="reservations__tags">
-            <div :class="['tag', 'label-medium', {'tag--active': page == 'reservations'}]" @click="changeFilter('reservations')">Нові</div> 
-            <div :class="['tag', 'label-medium', {'tag--active': page == 'orders'}]" @click="changeFilter('orders')">В процесі</div> 
-            <div :class="['tag', 'label-medium', {'tag--active': page == 'contracts'}]" @click="changeFilter('contracts')">Завершені</div> 
+        <!-- to fix -->
+        <div class="reservations__top">
+            <div class="reservations__tags">
+                <div :class="['tag', 'label-medium', {'tag--active': currentFilter == 'reservations'}]" @click="changeFilter('reservations')">Нові</div> 
+                <div :class="['tag', 'label-medium', {'tag--active': currentFilter == 'orders'}]" @click="changeFilter('orders')">В процесі</div> 
+                <div :class="['tag', 'label-medium', {'tag--active': currentFilter == 'contracts'}]" @click="changeFilter('contracts')">Завершені</div> 
+            </div>
+            <h2 class="title-medium">Ми вже передали ваші замовлення сервісам, які скоро звʼяжуться з вами!</h2>
         </div>
-        <h2 class="title-medium">Ми вже передали ваші замовлення сервісам, які скоро звʼяжуться з вами!</h2>
         <div class="reservations__cards">
-            <ReservationCard v-for="station in stations" :key="i" :station="station" @click="handleCardClick(station)" />
+            <ReservationCard v-for="station in stations" :key="station.name" :station="station" @click="handleCardClick(station)" />
         </div>
         <BottomSheetComponent v-if="currentsStation" :visible="bottomSheetVisible" @close="bottomSheetVisible = false">
             <div class="reservation-details">
-                <div class="reservation-details__top">
-                    <div class="btn btn--transparent" @click="bottomSheetVisible = false">
+                <div class="reservation-details__top desktop--hide">
+                    <div class="btn btn--transparent" @click="closeBottomSheet">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12.5 15L7.5 10L12.5 5" stroke="#3422F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -30,13 +33,13 @@
                     </div>
                     <p class="body-large">Мої бронювання</p>
                 </div>
-                <h2 class="title-medium">Про СТО</h2>
+                <h2 class="title-medium desktop--hide">Про СТО</h2>
                 <div class="reservation-details__gallery img-wrap img-wrap--cover">
-                    <img v-for="img in currentsStation.gallery" :key="idx" :src="img" alt="station-card" />
+                    <img v-for="img in currentsStation.gallery" :key="currentsStation.gallery" :src="img" alt="station-card" />
                 </div>
                 <div class="reservation-details__info">
                     <div class="reservation-details__info__title">
-                        <div class="img-wrap">
+                        <div class="img-wrap img-wrap--cover">
                             <img :src="currentsStation.imageUrl" alt="station-card" />
                         </div>
                         <h3 class="title-large">{{ currentsStation.name }}</h3>
@@ -117,6 +120,8 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter()
 
+const currentFilter = ref('reservations')
+
 const stations = ref([
     {
         name: 'Сервіс на кільцевій',
@@ -128,8 +133,8 @@ const stations = ref([
         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
         coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
     },
     {
         name: 'Сервіс на кільцевій',
@@ -141,8 +146,8 @@ const stations = ref([
         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
         coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
     },
     {
         name: 'Сервіс на кільцевій',
@@ -154,8 +159,47 @@ const stations = ref([
         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
         coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
+    },
+    {
+        name: 'Сервіс на кільцевій',
+        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом!',
+        rating: 4,
+        address: 'Столичне шосе, 101Г, Київ',
+        time: 'Працює з 9:00',
+        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+        coords: [50.4, 30.5],
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
+    },
+    {
+        name: 'Сервіс на кільцевій',
+        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
+        rating: 4,
+        address: 'Столичне шосе, 101Г, Київ',
+        time: 'Працює з 9:00',
+        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+        coords: [50.4, 30.5],
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
+    },
+    {
+        name: 'Сервіс на кільцевій',
+        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
+        rating: 4,
+        address: 'Столичне шосе, 101Г, Київ',
+        time: 'Працює з 9:00',
+        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+        coords: [50.4, 30.5],
+        gallery: ['https://placecats.com/300/200'],
+        imageUrl: 'https://placecats.com/millie_neo/300/200',
     },
 ])
 const bottomSheetVisible = ref(true)
@@ -163,7 +207,13 @@ const currentsStation = ref(null)
 
 const handleCardClick = (station) => {
     currentsStation.value = station
+    document.body.style.overflow = 'hidden'
     bottomSheetVisible.value = true
+}
+
+const closeBottomSheet = () => {
+    document.body.style.overflow = 'auto'
+    bottomSheetVisible.value = false
 }
 
 const handleBackBtn = () => {
@@ -173,8 +223,11 @@ const handleBackBtn = () => {
 
 <style lang="scss">
 .reservations {
-    > .title-medium {
+    .title-medium {
         margin: 2.8rem 0;
+        @media screen and (min-width: 768px) {
+            margin: 2.8rem 0 0;
+        }
     }
     &__heading {
         .btn {
@@ -191,14 +244,34 @@ const handleBackBtn = () => {
         margin-top: 2rem;
         display: flex;
         gap: 0.8rem;
+        @media screen and (min-width: 768px) {
+            margin-bottom: 2.8rem;
+        }
+    }
+    &__top {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        @media screen and (min-width: 768px) {
+            flex-direction: column-reverse;
+        }
     }
     &__cards {
         display: flex;
         gap: 1.6rem;
         flex-direction: column;
+        @media screen and (min-width: 768px) {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.8rem;
+
+        }
     }
 }
 .reservation-details {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     .btn--primary {
         margin-bottom: 0.8rem;
     }
@@ -221,6 +294,10 @@ const handleBackBtn = () => {
     &__gallery {
         margin-bottom: 2rem;
         border-radius: var(--round-16);
+        @media screen and (min-width: 768px) {
+            border-radius: 0;
+            margin: -1.6rem -1.6rem 2rem -1.6rem;
+        }
     }
     &__info {
         &__title {
@@ -234,6 +311,7 @@ const handleBackBtn = () => {
             }
             .img-wrap {
                 width: 3.2rem;
+                height: 3.2rem;
                 border-radius: var(--round-8);
                 border-top: 0.88px solid var(--neutrals-400);
             }
@@ -263,6 +341,9 @@ const handleBackBtn = () => {
                 fill: var(--warning-500);
             }
         }
+    }
+    &__btns {
+        margin-top: auto;
     }
 }
 </style>

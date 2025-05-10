@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import fs from 'fs'
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -11,26 +12,29 @@ export default defineNuxtConfig({
     // SCSS file in the project
     "~/assets/style/main.scss", // you should add main.scss somewhere in your app
   ],
-
   vite: {
     optimizeDeps: {
       include: ['mapbox-gl'],
     },
     server: {
-      allowedHosts: ['a862-195-49-149-22.ngrok-free.app']
+      allowedHosts: ['ba9b-185-143-147-154.ngrok-free.app'],
+      https: {
+        key: fs.readFileSync('./192.168.31.45-key.pem'),
+        cert: fs.readFileSync('./192.168.31.45.pem')
+      }
     }
   },  
 
-  modules: ["@vite-pwa/nuxt", '@vueuse/nuxt'],
+  modules: ["@vite-pwa/nuxt", '@vueuse/nuxt', '@pinia/nuxt', '@nuxt/image'],
 
   runtimeConfig: {
     public: {
+      apiBase: process.env.API_BASE,
       mapboxToken: process.env.MAPBOX_PERSONAL,
+      mapbox: {
+        accessToken: process.env.MAPBOX_PERSONAL
+      },
     }
-  },
-
-  mapbox: {
-    accessToken: process.env.MAPBOX_PERSONAL
   },
 
   pwa: {

@@ -71,12 +71,7 @@
       </div>
       <span class="count label-medium">{{ loc.totalRating }} відгуків</span>
     </div>
-    <div class="popup__tags">
-      <div class="tag label-medium">Ремонт двигуна</div>
-      <div class="tag label-medium">Заміна масла</div>
-      <div class="tag label-medium">Ремонт двигуна</div>
-      <div class="tag label-medium">Заміна масла</div>
-    </div>
+    <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
     <div class="popup__call">
       <div class="btn btn--transparent">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,20 +89,26 @@
     </div>
     <div class="popup__btns">
       <div class="btn btn--primary-dark"><p class="label-large">Забронювати</p></div>
-      <a href="station/dkjfkjds" class="btn btn--primary"><p class="label-large">Детальніше</p></a>
+      <div class="btn btn--primary" @click="goToStation"><p class="label-large">Детальніше</p></div>
     </div>
   </div>
   </div>
   </template>
   
 <script setup>
+  import { useRouter } from 'vue-router'
   const props = defineProps({
     loc: Object
   })
   const isVisible = ref(false)
-
+  const emit = defineEmits(['mounted'])
+  const router = useRouter()
+  const goToStation = () => {
+    router.push(`/station/${props.loc.id}`)
+  }
   onMounted(() => {
     // невелика затримка для тригеру transition
+    emit('mounted')
     requestAnimationFrame(() => {
       isVisible.value = true
     })
@@ -121,7 +122,7 @@
 .popup {
   border: 0.1rem solid var(--primary-300);
   box-shadow: 0px 10px 100px 0px #0000004D;
-  min-width: 28.3rem;
+  width: 28.3rem;
   background-color: #fff;
   padding: 1.6rem;
   border-radius: var(--round-16);

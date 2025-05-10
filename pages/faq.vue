@@ -1,7 +1,8 @@
 <template>
 <section class="faq">
     <div class="container">
-        <div class="faq__heading">
+        <!-- breadcrumbs -->
+        <div class="faq__heading desktop--hide">
             <div class="btn btn--transparent" @click="handleBackBtn">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.5 15L7.5 10L12.5 5" stroke="#3422F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -10,6 +11,7 @@
             </div>
             <p class="body-large">Часті питання та інше</p>
         </div>
+        <!-- to fix -->
         <div class="faq__tags">
             <div :class="['tag', 'label-medium', {'tag--active': page == 'faq'}]" @click="changePage('faq')">Часті питання</div> 
             <div :class="['tag', 'label-medium', {'tag--active': page == 'privacy'}]" @click="changePage('privacy')">Privacy policy</div>
@@ -96,16 +98,29 @@ const handleBackBtn = () => {
         display: flex;
         overflow-x: scroll;
         gap: 0.8rem;
+        @media screen and (min-width: 1024px) {
+            margin-bottom: 0;
+        }
+    }
+    .title-medium {
+        margin: 2.8rem 0;
     }
     &__questions {
         margin-bottom: 4rem;
         display: flex;
         flex-direction: column;
         gap: 0.8rem;
+        @media screen and (min-width: 1024px) {
+            margin-top: 2.8rem;
+            margin-bottom: 8rem;
+        }
         > .title-large {
             font-weight: 500;
             font-size: 2.2rem;
             margin: 0;
+            @media screen and (min-width: 1024px) {
+                margin-bottom: 2.8rem;
+            }
         }
         > .body-medium {
             color: var(--neutrals-700);
@@ -115,10 +130,14 @@ const handleBackBtn = () => {
 }
 .pages-enter-active,
 .pages-leave-active {
-  transition: all 0.2s ease;
+  transition: all 1s ease;
 } 
-.pages-enter-from,
+.pages-enter-from {
+    filter: blur(0.4rem);
+    opacity: 0;
+    transform: translateY(10%);
+}
 .pages-leave-to {
-  opacity: 0;;
+    display: none;
 }
 </style>

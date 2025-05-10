@@ -1,14 +1,7 @@
 <template>
 <section class="map">
     <div class="map__menu">
-        <div class="map__menu__filters">
-            <div class="tag tag--active label-medium">Всі</div>
-            <div class="tag label-medium">Авто</div>
-            <div class="tag label-medium">Мото</div>
-            <div class="tag label-medium">Кардан</div>
-            <div class="tag label-medium">Карбюратор</div>
-            <div class="tag label-medium">ГБО</div>
-        </div>
+        <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
         <div class="map__menu__dropdown">
             <Listbox
                 as="div"
@@ -89,6 +82,22 @@ function handleMarkerClick(location) {
         backdrop-filter: blur(2px);
         -webkit-backdrop-filter: blur(2px);
         z-index: 2;
+        @media screen and (min-width: 1024px) {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1120px;
+            margin: 2.8rem auto 4rem auto;
+            padding: 0;
+            > .tags-container-wrapper {
+                margin-bottom: 0;
+                max-width: 50%;
+            }
+            .map__menu__dropdown {
+                width: 34.3rem;
+            }
+        }
         &__filters {
             margin: 0 -1.6rem 1.6rem 0;
             display: flex;
@@ -122,6 +131,14 @@ function handleMarkerClick(location) {
         }
     }
     .map-container {
+        @media screen and (min-width: 1024px) {
+            max-width: 1120px;
+            height: 53rem;
+            margin: 0 auto;
+            overflow: hidden;
+            margin-bottom: 4rem;
+            border-radius: 2.8rem;
+        }
         .mapboxgl-ctrl-bottom-left {
             margin: 0 0 10px 0;
         }

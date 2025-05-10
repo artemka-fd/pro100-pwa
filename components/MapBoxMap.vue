@@ -4,14 +4,16 @@
 
 <script setup lang="ts">
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, toRaw } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import { useRuntimeConfig } from 'nuxt/app'
-import MapPopup from './ MapPopup.vue'
+import MapPopup from '@/components/MapPopup.vue'
 import { createApp } from 'vue'
+import { useRouter } from '#app'
 
 const props = defineProps<{
   locations: Location[]
+  center?: [number, number]
 }>()
 
 const map = ref<mapboxgl.Map>()
@@ -19,7 +21,9 @@ const mapContainer = ref<HTMLElement>()
 const markers = ref<mapboxgl.Marker[]>([])
 const defaultCenter: [number, number] = props.center || [30.5238, 50.4547]
 const activeMarkerId = ref<string | number | null>(null)
+const currentPopup = ref<mapboxgl.Popup | null>(null)
 
+const router = useRouter()
 const config = useRuntimeConfig()
 
 onMounted(() => {
@@ -33,18 +37,40 @@ onMounted(() => {
 
   map.value.on('load', () => {
     renderMarkers()
-    if(props.locations.length === 1) {
+    if (props.locations.length === 1) {
       map.value?.flyTo({
-        center: { lng: props.locations[0].lng, lat: props.locations[0].lat },
-        essential: true, // для accessibility
-        zoom: 13,         // опціонально: зміни масштаб
-        speed: 1.2,       // швидкість анімації (0.5 - повільно, 2 - швидко)
-        curve: 1.42       // кривизна траєкторії
+        center: {
+          lng: props.locations[0].lng,
+          lat: props.locations[0].lat,
+        },
+        essential: true,
+        zoom: 13,
+        speed: 1.2,
+        curve: 1.42,
       })
     }
-    // DEBUG: виводимо map
-    console.log('Map loaded!', map.value)
   })
+  map.value?.on('click', (e) => {
+    const clickedEl = e.originalEvent.target as HTMLElement
+    console.log(clickedEl, currentPopup.value)
+
+    // Якщо це попап або маркер — не закриваємо
+    if (
+      clickedEl.closest('.mapboxgl-popup') ||
+      clickedEl.closest('.custom-marker')
+    ) {
+      return
+    }
+
+    // Інакше — закриваємо попап
+    if (currentPopup.value) {
+      currentPopup.value.remove()
+      currentPopup.value = null
+      activeMarkerId.value = null
+      updateMarkerStyles()
+    }
+  })
+
 })
 
 function renderMarkers() {
@@ -53,57 +79,61 @@ function renderMarkers() {
     el.className = 'custom-marker'
     el.innerHTML = `<img src="${loc.imageUrl ?? 'https://placekitten.com/64/64'}" alt="marker" />`
 
-    if(props.locations.length === 1) {
-      el.addEventListener('click', () => {
-        console.log('Clicked marker')
-        map.value?.flyTo({
-          center: { lng: loc.lng, lat: loc.lat },
-          essential: true, // для accessibility
-          zoom: 13,         // опціонально: зміни масштаб
-          speed: 1.2,       // швидкість анімації (0.5 - повільно, 2 - швидко)
-          curve: 1.42       // кривизна траєкторії
-        })
-        activeMarkerId.value = loc.id
-
-        // popup
-        const popupComponent = createApp(MapPopup, { loc });
-        const popupHTML = popupComponent.mount(document.createElement('div')).$el;
-
-        marker.setPopup(new mapboxgl.Popup().setDOMContent(popupHTML))
-        updateMarkerStyles()
-      })
-    } else {
-      el.addEventListener('click', () => {
-        map.value?.flyTo({
-          center: { lng: loc.lng, lat: loc.lat },
-          essential: true, // для accessibility
-          zoom: 13,         // опціонально: зміни масштаб
-          speed: 1.2,       // швидкість анімації (0.5 - повільно, 2 - швидко)
-          curve: 1.42       // кривизна траєкторії
-        })
-        activeMarkerId.value = loc.id
-
-        // popup
-        const popupComponent = createApp(MapPopup, { loc });
-        const popupHTML = popupComponent.mount(document.createElement('div')).$el;
-
-        marker.setPopup(new mapboxgl.Popup({offset: [0, -100], anchor: 'top'}).setDOMContent(popupHTML))
-        updateMarkerStyles()
-      })
-    }
-    
     const marker = new mapboxgl.Marker(el)
-    .setLngLat([loc.lng, loc.lat])
-    .addTo(toRaw(map.value))
-    
+      .setLngLat([loc.lng, loc.lat])
+      .addTo(toRaw(map.value))
+
+    el.addEventListener('click', () => {
+      if (currentPopup.value) {
+        console.log()
+        currentPopup.value.remove()
+        currentPopup.value = null
+        activeMarkerId.value = null
+        updateMarkerStyles()
+      }
+      const isMobile = window.innerWidth < 1024
+
+      map.value?.flyTo({
+        center: { lng: loc.lng, lat: loc.lat },
+        essential: true,
+        zoom: 13,
+        speed: 1.2,
+        curve: 1.42,
+        offset: isMobile ? [0, 250] : [0, 150],
+      })
+
+      activeMarkerId.value = loc.id
+      updateMarkerStyles()
+
+      // Створюємо новий Vue-попап
+      const popupNode = document.createElement('div')
+      const popupApp = createApp(MapPopup, { loc })
+      popupApp.use(router)
+      popupApp.mount(popupNode)
+
+
+      const popup = new mapboxgl.Popup({
+        offset: [0, 0],
+        anchor: 'bottom',
+        closeButton: false,
+        closeOnClick: false,
+      })
+        .setLngLat([loc.lng, loc.lat])
+        .setDOMContent(popupNode)
+        .addTo(map.value!)
+
+      currentPopup.value = popup
+    })
+
     markers.value.push(marker)
   })
 }
 
 function updateMarkerStyles() {
-  Object.entries(markers.value).forEach(([id, marker]) => {
-    const el = marker.getElement() 
-    if (id === String(activeMarkerId.value)) {
+  markers.value.forEach((marker, index) => {
+    const el = marker.getElement()
+    const markerLoc = props.locations[index]
+    if (markerLoc.id === activeMarkerId.value) {
       el.classList.add('active-marker')
     } else {
       el.classList.remove('active-marker')
@@ -111,6 +141,7 @@ function updateMarkerStyles() {
   })
 }
 </script>
+
 
 <style lang="scss">
 .map-container {
@@ -152,10 +183,13 @@ function updateMarkerStyles() {
 
 /* Попап */
 .mapboxgl-popup-content {
-  background-color: transparent;
-  box-shadow: none;
+  background-color: transparent !important;
+  box-shadow: none !important;
   padding: 0;
   border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .mapboxgl-popup-close-button {
   display: none;

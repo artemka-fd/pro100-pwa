@@ -1,9 +1,16 @@
 <template>
     <div class="station-card">
-        <div class="station-card__top" ref="cardTop">
+        <div class="station-card__top" ref="cardTop" @click="handleCardClick">
             <div class="station-card__top-top">
                 <div class="station-card__top-image img-wrap">
-                    <img :src="station.imageUrl" alt="station-card" />
+                    <NuxtImg
+                        src="https://demo-source.imgix.net/mountains.jpg"
+                        width="600"
+                        height="400"
+                        alt="Наш Чмих"
+                        format="webp"
+                    />
+                    <!-- <img :src="station.imageUrl ?? 'https://placecats.com/neo_banana/300/200'" alt="station-card" /> -->
                 </div>
                 <div class="station-card__top-like">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,7 +21,7 @@
             <div class="station-card__top-bottom">
                 <p class="title-large">{{ station.name }}</p>
                 <div class="station-card__top-bottom__info">
-                    <p class="label-medium">12 км від вас</p>
+                    <p class="label-medium">{{ distance.distanceKm }} км від вас</p>
                     <svg width="88" height="16" viewBox="0 0 88 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.00016 1.33331L10.0602 5.50665L14.6668 6.17998L11.3335 9.42665L12.1202 14.0133L8.00016 11.8466L3.88016 14.0133L4.66683 9.42665L1.3335 6.17998L5.94016 5.50665L8.00016 1.33331Z" fill="#FFC211" stroke="#FFC211" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M26.0002 1.33331L28.0602 5.50665L32.6668 6.17998L29.3335 9.42665L30.1202 14.0133L26.0002 11.8466L21.8802 14.0133L22.6668 9.42665L19.3335 6.17998L23.9402 5.50665L26.0002 1.33331Z" fill="#FFC211" stroke="#FFC211" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -38,7 +45,7 @@
                     </clipPath>
                     </defs>
                 </svg>                    
-                <p class="body-medium">{{ station.address }}</p>
+                <p class="body-medium">(тут буде адреса)</p>
             </div>
             <div class="station-card__bottom__info">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,19 +58,15 @@
                     </clipPath>
                     </defs>
                 </svg>                                      
-                <p class="body-medium">{{ station.time }}</p>
+                <p class="body-medium">Працює з {{ station.workingHours.friday.start }}:00</p>
             </div>
-            <div class="station-card__bottom__tags">
-                <div class="tag" v-for="tag in station.tags" :key="tag">
-                    <p class="label-medium">{{ tag }}</p>
-                </div>
-            </div>
+            <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
             <div class="station-card__bottom__btns">
                 <div class="btn btn--primary-dark">
                     <p class="label-large">Бронювати</p>
                 </div>
                 <div class="btn btn--primary">
-                    <p class="label-large">Детальніше</p>
+                    <NuxtLink :to="`/station/${station.nameSlug}`" class="label-large">Детальніше</NuxtLink>
                 </div>
                 <div class="btn btn--transparent">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,17 +86,43 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+import { getRouteFromMapbox } from "@/utils/getRoute"
+
+const distance = ref({
+    distanceKm: 0,
+})
+
 const props = defineProps({
     station: {
         type: Object,
         required: true,
     },
+    userCoords: {
+        type: Object,
+        required: false,
+        default: {
+            lat: 50.4,
+            lon: 30.5
+        }
+    }
 })
+const router = useRouter()
+const config = useRuntimeConfig()
 
 const cardTop = ref(null)
 
-onMounted(() => {
-    cardTop.value.style.backgroundImage = `url(${props.station.gallery[0]})`
+const handleCardClick = () => {
+    router.push(`/station/${props.station.nameSlug}`)
+}
+
+onMounted(async () => {
+    cardTop.value.style.backgroundImage = `url(${props.station.photoUrls[0].replace('https', 'http')})`
+    const user = [props.userCoords.lat, props.userCoords.lon]
+    const station = [props.station.location.coordinates[1], props.station.location.coordinates[0]]
+
+    const info = await getRouteFromMapbox(user, station, config.public.mapboxToken)
+    distance.value = info
 })
 
 </script>
@@ -102,12 +131,14 @@ onMounted(() => {
 .station-card {
     box-shadow: 0px 0px 100px 0px #0000001A;
     border-radius: var(--round-16);
+    min-width: 0;
     &__top {
         background-size: cover;
         position: relative;
         padding: 0.8rem;
         border-radius: var(--round-16) var(--round-16) 0 0;
         z-index: 2;
+        cursor: pointer;
         &-like {
             padding: 0.8rem;
             display: flex;
@@ -146,12 +177,13 @@ onMounted(() => {
             }
         }
         &-image {
-            width: fit-content;
+            width: 5.6rem;
+            height: 5.6rem;
             border: 0.88px solid var(--neutrals-400);
             border-radius: var(--round-8);
             > img {
+                object-fit: cover;
                 border-radius: var(--round-8);
-                width: 5.6rem;
             }
         }
     }
@@ -160,7 +192,10 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         gap: 1.6rem;
-        margin-bottom: 1.6rem;
+            .tags-container-wrapper {
+                margin-bottom: 0;
+                flex-shrink: 1;
+            }
         &__info {
             display: flex;
             gap: 0.8rem;

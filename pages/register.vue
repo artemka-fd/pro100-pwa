@@ -6,9 +6,22 @@
             <p class="title-medium">Введіть свої дані для авторизації</p>
         </div>
         <div class="register__tel">
-            <InputComponent label="Імʼя" placeholder="Введіть своє ПІБ або імʼя" />
-            <InputComponent label="Номер телефону" placeholder="Введіть свій номер" />
-            <InputComponent label="Пошта" placeholder="Введіть свою електронну адресу" />
+            <InputComponent
+                v-model="name"
+                label="Імʼя"
+                placeholder="Введіть своє ПІБ або імʼя"
+            />
+            <InputComponent
+                v-model="phone"
+                label="Номер телефону"
+                placeholder="Введіть свій номер"
+                mask="+38 (###) ### ## ##"
+            />
+            <InputComponent 
+                v-model="email"
+                label="Пошта"
+                placeholder="Введіть свою електронну адресу"
+            />
         </div>
         <div class="register__register">
             <p class="body-medium">Вже маєте Vroom-акаунт?</p>
@@ -30,12 +43,22 @@
 </template>
 
 <script setup>
+import InputComponent from '~/components/InputComponent.vue';
 
+const name = ref('');
+const phone = ref('');
+const email = ref('');
+
+
+
+watch(phone, () => {
+    phone.value = phone.value.replace(/\D/g, '');
+    console.log(phone.value.length);
+})
 </script>
 
 <style lang="scss">
 .register {
-    height: calc(100vh - 18rem);
     padding: 4rem 0 8rem 0;
     .container {
         display: flex;
@@ -45,6 +68,9 @@
         height: 100%;
         > .btn {
             margin-top: auto;
+        }
+        @media screen and (min-width: 768px) {
+            max-width: 34.3rem;
         }
     }
     .display-small {

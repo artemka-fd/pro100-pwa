@@ -4,5 +4,5 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "types": ["vite/client"] // або 'node' — залежить від проєкту
-  }
+  },
 }

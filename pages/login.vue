@@ -42,7 +42,12 @@
         gap: 4rem;
         height: 100%;
         > .btn {
-            margin-top: auto;
+            @media screen and (min-width: 768px) {
+                margin-top: 4rem;
+            }
+        }
+        @media screen and (min-width: 768px) {
+            max-width: 34.3rem;
         }
     }
     .display-small {

@@ -1,39 +1,53 @@
 <template>
-<div>
-    <p v-if="label !== ''" class="input__label body-large">{{ label }}</p>
-    <div class="input">
+    <div class="input__wrap">
+      <p v-if="label !== ''" class="input__label body-large">{{ label }}</p>
+      <div class="input">
         <input
-            type="text"
-            class="input__text"
-            :placeholder="placeholder"
+          type="text"
+          class="input__text"
+          :placeholder="placeholder"
+          :value="modelValue"
+          @input="$emit('update:modelValue', $event.target.value)"
+          v-maska="mask"
         >
         <div
-            v-if="iconSrc !== ''"
-            class="img-wrap"
+          v-if="iconSrc !== ''"
+          class="img-wrap"
         >
-            <img :src="iconSrc" alt="">
+          <img :src="iconSrc" alt="">
         </div>
+      </div>
     </div>
-    <!-- <input type="text" class="input"> -->
-</div>
-</template>
-
-<script setup>
-const props = defineProps({
+  </template>
+  
+  <script setup>
+  import { vMaska } from 'maska/vue';
+  const props = defineProps({
     placeholder: {
-        type: String,
-        default: 'placeholder'
+      type: String,
+      default: 'placeholder'
     },
     label: {
-        type: String,
-        default: ''
+      type: String,
+      default: ''
     },
     iconSrc: {
+      type: String,
+      default: ''
+    },
+    modelValue: {
+      type: String,
+      default: ''
+    },
+    mask: {
         type: String,
-        default: ''
+        default: null,
     }
-})
-</script>
+  })
+  
+  const emit = defineEmits(['update:modelValue'])
+  </script>
+  
 
 <style lang="scss">
 .input {
@@ -44,6 +58,11 @@ const props = defineProps({
     border: 1px solid var(--neutrals-300);
     border-radius: 0.8rem;
     box-shadow: 0px 4px 16px 0px #0000000F;
+    &:focus{
+        outline: none;
+        //@at-root .input__wrap{&} {
+        //}
+    }
     &__label {
         margin: 0 0 0.8rem 0;
         color: var(--neutrals-700);

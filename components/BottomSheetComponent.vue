@@ -24,31 +24,46 @@
     left: 0;
     right: 0;
     top: 0;
-    background: rgba(0, 0, 0, 0.3);
     z-index: 999;
+    backdrop-filter: blur(0.1rem);
+    
+    @media screen and (min-width: 768px) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
   
     &__content {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
+      top: 5rem;
       background: white;
       border-top-left-radius: var(--round-16);
       border-top-right-radius: var(--round-16);
       padding: 1.6rem;
-      max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 -2px 100px rgba(0, 0, 0, 0.2);
       animation: slide-up-enter 0.3s ease-out forwards;
+
+      @media screen and (min-width: 768px) {
+        position: relative;
+        height: 57rem;
+        width: 55.3rem;
+        border-radius: var(--round-16);
+      }
     }
   }
   
   .slide-up-enter-active,
   .slide-up-leave-active {
-    transition: opacity 0.2s ease;
+    transition: all 0.3s ease-in-out;
   }
   .slide-up-enter-from,
   .slide-up-leave-to {
+    transform: translateY(100%);
     opacity: 0;
   }
   </style>

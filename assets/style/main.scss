@@ -28,6 +28,18 @@ body {
     }
 }
 
+@media screen and (max-width: 1024px) {
+.mobile--hide {
+        display: none !important;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+.desktop--hide {
+        display: none !important;
+    }
+}
+
 .img-wrap {
     overflow: hidden; /* Обрізає вихідні частини зображення */
     display: flex;
@@ -60,8 +72,14 @@ body {
     padding: 0.8rem 0.925rem;
     border-radius: var(--round-full);
     text-decoration: none;
+    cursor: pointer;
+    > a {
+        text-decoration: none;
+        color: var(--primary-100);
+    }
     p {
         margin: 0;
+        text-decoration: none;
     }
     &--primary {
         color: var(--primary-100);
@@ -75,9 +93,16 @@ body {
         &--red {
             color: var(--error-300);
         }
+        &--primary-dark {
+            color: var(--primary-1000);
+        }
     }
     &--full-width {
         width: 100%;
+    }
+    &--back {
+        justify-content: start;
+        padding-left: 0;
     }
 }
 
@@ -101,6 +126,11 @@ body {
     padding: 0.8rem 1.6rem;
     border: 1px solid var(--primary-300);
     flex-shrink: 0;
+    font-family: "Cy Grotesk", sans-serif;
+    line-height: 1.6000rem;
+    letter-spacing: 0.0500px;
+    font-weight: 500;
+    font-size: 1.2rem;
 }
 .tag--active {
     border: none;

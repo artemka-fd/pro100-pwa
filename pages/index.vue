@@ -1,14 +1,7 @@
 <template>
 <section class="home">
     <div class="container">
-        <div class="home__tags">
-            <div class="tag tag--active label-medium">Всі</div>
-            <div class="tag label-medium">Авто</div>
-            <div class="tag label-medium">Мото</div>
-            <div class="tag label-medium">Кардан</div>
-            <div class="tag label-medium">Карбюратор</div>
-            <div class="tag label-medium">ГБО</div>
-        </div>
+        <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
         <h3 class="title-medium">На цій сторінці ви можете переглянути <span>картки СТО-шек,</span> які ви відмітили :)</h3>
 
         <Listbox
@@ -33,7 +26,22 @@
             </ListboxOptions>
         </Listbox>
         <div class="home__cards">
-            <StationCard v-for="station in stations" :key="station.name" :station="station" />
+            <StationCard v-for="station in stations" :key="station.nameSlug" :station="station" :userCoords="userLocation" />
+        </div>
+        <div class="home__load-more">
+            <div class="btn btn--transparent">
+                <p class="label-large">Завантажити більше</p>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_10125_5342)">
+                    <path d="M19.1663 3.33335V8.33335M19.1663 8.33335H14.1663M19.1663 8.33335L15.2997 4.70001C14.4041 3.80394 13.296 3.14935 12.079 2.79732C10.862 2.4453 9.5756 2.4073 8.33991 2.68689C7.10423 2.96648 5.95951 3.55454 5.01256 4.39619C4.06562 5.23785 3.34731 6.30567 2.92467 7.50001M0.833008 16.6667V11.6667M0.833008 11.6667H5.83301M0.833008 11.6667L4.69967 15.3C5.5953 16.1961 6.70332 16.8507 7.92035 17.2027C9.13738 17.5547 10.4238 17.5927 11.6594 17.3131C12.8951 17.0335 14.0398 16.4455 14.9868 15.6038C15.9337 14.7622 16.652 13.6944 17.0747 12.5" stroke="#3422F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                    <defs>
+                    <clipPath id="clip0_10125_5342">
+                    <rect width="20" height="20" fill="white"/>
+                    </clipPath>
+                    </defs>
+                </svg>                    
+            </div>
         </div>
     </div>
 </section>
@@ -47,50 +55,76 @@ ListboxButton,
 ListboxOptions,
 ListboxOption,
 } from '@headlessui/vue'
+import TagsComponent from '~/components/TagsComponent.vue';
+import { getStations } from '~/services/api/stations' 
+// import { getRouteFromMapbox } from '~/utils/getRoute'
 
-const stations = ref([
-    {
-        name: 'Сервіс на кільцевій',
-        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
-        rating: 4,
-        address: 'Столичне шосе, 101Г, Київ',
-        time: 'Працює з 9:00',
-        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
-        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
-        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
-        coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
-    },
-    {
-        name: 'Сервіс на кільцевій',
-        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
-        rating: 4,
-        address: 'Столичне шосе, 101Г, Київ',
-        time: 'Працює з 9:00',
-        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
-        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
-        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
-        coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
-    },
-    {
-        name: 'Сервіс на кільцевій',
-        description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
-        rating: 4,
-        address: 'Столичне шосе, 101Г, Київ',
-        time: 'Працює з 9:00',
-        tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
-        scheduleBusiness: 'Пн-Пт: 08:10-20:30',
-        scheduleWeekend: 'Сб-Нд: 9:15-21:00',
-        coords: [50.4, 30.5],
-        gallery: ['https://s3-alpha-sig.figma.com/img/57d9/327e/009ead6e9d3fe305bd7332c3462417fb?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=BC0KygqnFzR9v5g-OPQBPZLd4DhEDMvSTUOubyPiCf1UJeDIJnVBnrAefwJT6-QqVT1njOZc3A4ggqfmEbJzF71TjrpDbU-e6541ut6WhJRJtwn8VPorcC~lv~fxTpzxKgmlDaZ~Au-1tWyfgaQ~Nlqzz0ZL71-CZHuxHiS1WIbcP4gX-4nMkWJpG13AoPJgybMxM6Es29GTJpyzuHLf4x2bg5l7gB0BIwsl54TSlRUr4YjNfu9SQ96JgNZNhy5H7oLR59WYnwiuLM3JIAOhuYNSUMQDcNYTMTS8lJ5dri6zaWL3V7XQHpIBfOVQ63L8aUmsUAiwuguVP6RfSPmgow__'],
-        imageUrl: 'https://s3-alpha-sig.figma.com/img/7f6f/1740/bb519962ee07438a1a28951c5d5294c7?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=MWS6KVrp~OkZacjoisEJvaehhMmoIiYyADmqVrvSp5aJ5D1cSvWxGqxKFYNzb-grBxv47arVlwXVaCiUq7vHJGUicicZ3QlbT0EqtHCXPxB~KWnk8jK51ZfcvskZYgLcGD6vq8Ir6SgDbQcJInvBpb5pixETFSXCdaGz5XW4gJa4UydkV2CQpictQD1YsLz-SOpg7UyZcun0VSZErsd7d~CEQpdwGkHlPTzTJPzb~Dt3w7AJDsTgCWRS52x1w8e2AvHITVVQahDpJ7JtrvJAFFPlQiH4Ak44mVh6xCBKO68kUCHWLDK-sir36zENVqui9WRAMrupBnjxes8rhI-SDg__',
-    },
-])
+// const stations = ref([
+//     {
+//         name: 'Сервіс на кільцевій',
+//         description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
+//         rating: 4,
+//         address: 'Столичне шосе, 101Г, Київ',
+//         time: 'Працює з 9:00',
+//         tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+//         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+//         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+//         coords: [50.4, 30.5],
+//         gallery: ['https://placecats.com/neo_banana/300/200'],
+//         imageUrl: 'https://placecats.com/bella/300/200',
+//     },
+//     {
+//         name: 'Сервіс на кільцевій',
+//         description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
+//         rating: 4,
+//         address: 'Столичне шосе, 101Г, Київ',
+//         time: 'Працює з 9:00',
+//         tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+//         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+//         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+//         coords: [50.4, 30.5],
+//         gallery: ['https://placecats.com/neo_banana/300/200'],
+//         imageUrl: 'https://placecats.com/bella/300/200',
+//     },
+//     {
+//         name: 'Сервіс на кільцевій',
+//         description: 'Сервіс на Кільцевій - це сучасне СТО з професійним підходом! Сервіс на Кільцевій - це сучасне СТО з професійним підходом та цінами :)',
+//         rating: 4,
+//         address: 'Столичне шосе, 101Г, Київ',
+//         time: 'Працює з 9:00',
+//         tags: ['Ремонт двигуна', 'Заміна масла', 'Покраска'],
+//         scheduleBusiness: 'Пн-Пт: 08:10-20:30',
+//         scheduleWeekend: 'Сб-Нд: 9:15-21:00',
+//         coords: [50.4, 30.5],
+//         gallery: ['https://placecats.com/neo_banana/300/200'],
+//         imageUrl: 'https://placecats.com/bella/300/200',
+//     },
+// ])
 
 // dropdown
+
+const userLocation = ref({ lat: null, lon: null })
+
+const { data: stations, pending, error } = await useAsyncData('stations', () =>
+  getStations(50.4, 30.5)
+)
+
+onMounted(async () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        userLocation.value.lat = position.coords.latitude
+        userLocation.value.lon = position.coords.longitude
+      },
+      error => {
+        userLocation.value.lat = 50.4429
+        userLocation.value.lon = 30.5204
+        console.error("Не вдалося отримати геолокацію", error)
+      }
+    )
+  }
+})
+
 const filters = [
 { id: 1, name: 'Найпопулярніші', unavailable: false },
 { id: 2, name: 'Kenton Towne', unavailable: false },
@@ -102,6 +136,8 @@ const selectedFilter = ref(filters[0])
 </script>
 
 <style lang="scss">
+$grid-gap: 2.8rem;
+
 .home {
     .title-medium {
         color: var(--primary-1000);
@@ -116,6 +152,49 @@ const selectedFilter = ref(filters[0])
         gap: 0.8rem;
         overflow-x: scroll;
         margin-bottom: 2.8rem;
+    }
+    &__cards {
+        position: relative;
+        width: 100%;
+        display: grid;
+        gap: $grid-gap;
+        grid-template-columns: repeat(1, 1fr);
+        /*
+            Використовуємо вкладені медіа-запити в SCSS
+        */
+
+        /* Медіа-запит для планшетів */
+        @media screen and (min-width: 768px) {
+            /* Два стовпці на планшетах */
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Медіа-запит для десктопів */
+        @media screen and (min-width: 1280px) {
+            /* Три стовпці на десктопах */
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    &__load-more {
+        margin-top: 2.8rem;
+        .btn {
+            cursor: pointer;
+            width: fit-content;
+            margin: 0 auto;
+            transition: all 0.2s ease-in-out;
+            svg {
+                transition: all 0.2s ease-in-out;
+            }
+            .label-large {
+                color: var(--primary-700);
+            }
+            &:hover {
+                background-color: #3422f21a;
+                svg {
+                    transform: rotate(180deg);
+                }
+            }
+        }
     }
     &__dropdown {
         margin-bottom: 2.8rem;
