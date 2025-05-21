@@ -25,7 +25,19 @@ export default defineNuxtConfig({
     }
   },  
 
+  plugins: [
+    {
+      src: '~/plugins/firebase.js',
+      mode: 'client', // Важливо: плагін Firebase повинен працювати тільки на клієнті
+    },
+    { src: '~/plugins/persistedstate.client.js', mode: 'client' }
+  ],
+
   modules: ["@vite-pwa/nuxt", '@vueuse/nuxt', '@pinia/nuxt', '@nuxt/image'],
+
+  pinia: {
+    modules: ['./stores/**.js'],
+  },
 
   runtimeConfig: {
     public: {
@@ -34,7 +46,18 @@ export default defineNuxtConfig({
       mapbox: {
         accessToken: process.env.MAPBOX_PERSONAL
       },
+      firebaseApiKey: process.env.FIREBASE_API_KEY,
+      firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+      firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      firebaseAppId: process.env.FIREBASE_APP_ID,
+      // firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
     }
+  },
+
+  router: {
+    middleware: ['auth'] // Застосовуємо middleware до всіх сторінок
   },
 
   pwa: {
@@ -47,7 +70,7 @@ export default defineNuxtConfig({
     },
     workbox: {
       navigateFallback: '/',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+      // globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
     },
     registerType: 'autoUpdate', // Автоматичне оновлення PWA
     devOptions: {

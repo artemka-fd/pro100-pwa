@@ -14,7 +14,7 @@
           v-if="iconSrc !== ''"
           class="img-wrap"
         >
-          <img :src="iconSrc" alt="">
+          <NuxtImg :src="iconSrc" alt="" />
         </div>
       </div>
     </div>
@@ -81,6 +81,9 @@
             font-size: 1.6rem;
             line-height: 2.4000rem;
         }
+    }
+    > .img-wrap {
+      width: 2rem;
     }
 }
 </style>

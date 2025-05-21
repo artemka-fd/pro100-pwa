@@ -1,5 +1,5 @@
 <template>
-    <NuxtLayout name="404">
+    <NuxtLayout name="error">
     <div class="error-page">
         <div class="error-page__bg">
         </div>

@@ -40,6 +40,7 @@ ListboxButton,
 ListboxOptions,
 ListboxOption,
 } from '@headlessui/vue'
+import { getStations } from '~/services/api/stations' 
 
 // dropdown
 const filters = [
@@ -52,17 +53,20 @@ const filters = [
 const selectedFilter = ref(filters[0])
 
 // map
-const stations = Array.from({ length: 30 }, (_, i) => ({
-  name: Math.random().toString(),
-  address: 'Столичне шосе, 101Г, Київ',
-  totalRating: (Math.random() * 0.2).toString().slice(2,3),
-  rating: (Math.random() * 0.2).toString().slice(2,3), 
-  time: `Працює з ${Math.random().toString().slice(2,3)}:${Math.random().toString().slice(3,5)}`,
-  id: i,
-  lat: 50.4 + Math.random() * 0.1,
-  lng: 30.5 + Math.random() * 0.1,
-  imageUrl: 'https://placecats.com/300/200?fit=contain&position=top',
-}))
+const { data: stations, pending, error } = await useAsyncData('stations', () =>
+  getStations(50.4, 30.5)
+)
+// const stations = Array.from({ length: 30 }, (_, i) => ({
+//   name: Math.random().toString(),
+//   address: 'Столичне шосе, 101Г, Київ',
+//   totalRating: (Math.random() * 0.2).toString().slice(2,3),
+//   rating: (Math.random() * 0.2).toString().slice(2,3), 
+//   time: `Працює з ${Math.random().toString().slice(2,3)}:${Math.random().toString().slice(3,5)}`,
+//   id: i,
+//   lat: 50.4 + Math.random() * 0.1,
+//   lng: 30.5 + Math.random() * 0.1,
+//   imageUrl: 'https://placecats.com/300/200?fit=contain&position=top',
+// }))
 
 function handleMarkerClick(location) {
   console.log('Clicked:', location)

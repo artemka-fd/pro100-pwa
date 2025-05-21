@@ -80,7 +80,7 @@ function renderMarkers() {
     el.innerHTML = `<img src="${loc.imageUrl ?? 'https://placekitten.com/64/64'}" alt="marker" />`
 
     const marker = new mapboxgl.Marker(el)
-      .setLngLat([loc.lng, loc.lat])
+      .setLngLat([loc.location.coordinates[0], loc.location.coordinates[1]])
       .addTo(toRaw(map.value))
 
     el.addEventListener('click', () => {
@@ -94,7 +94,7 @@ function renderMarkers() {
       const isMobile = window.innerWidth < 1024
 
       map.value?.flyTo({
-        center: { lng: loc.lng, lat: loc.lat },
+        center: { lng: loc.location.coordinates[0], lat: loc.location.coordinates[1] },
         essential: true,
         zoom: 13,
         speed: 1.2,
@@ -118,7 +118,7 @@ function renderMarkers() {
         closeButton: false,
         closeOnClick: false,
       })
-        .setLngLat([loc.lng, loc.lat])
+        .setLngLat([loc.location.coordinates[0], loc.location.coordinates[1]])
         .setDOMContent(popupNode)
         .addTo(map.value!)
 

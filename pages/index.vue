@@ -57,6 +57,7 @@ ListboxOption,
 } from '@headlessui/vue'
 import TagsComponent from '~/components/TagsComponent.vue';
 import { getStations } from '~/services/api/stations' 
+import { useAuthStore } from '~/stores/authStore';
 // import { getRouteFromMapbox } from '~/utils/getRoute'
 
 // const stations = ref([
@@ -104,6 +105,7 @@ import { getStations } from '~/services/api/stations'
 // dropdown
 
 const userLocation = ref({ lat: null, lon: null })
+const authStore = useAuthStore();
 
 const { data: stations, pending, error } = await useAsyncData('stations', () =>
   getStations(50.4, 30.5)
@@ -133,6 +135,9 @@ const filters = [
 { id: 5, name: 'Katelyn Rohan', unavailable: false },
 ]
 const selectedFilter = ref(filters[0])
+onMounted(() => {
+    console.log(authStore, 'user')
+})
 </script>
 
 <style lang="scss">

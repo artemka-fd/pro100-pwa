@@ -45,7 +45,9 @@
                     </clipPath>
                     </defs>
                 </svg>                    
-                <p class="body-medium">(тут буде адреса)</p>
+                <p class="body-medium">
+                    {{ station.address }}
+                </p>
             </div>
             <div class="station-card__bottom__info">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -198,6 +200,7 @@ onMounted(async () => {
             }
         &__info {
             display: flex;
+            align-items: center;
             gap: 0.8rem;
             p {
                 margin: 0;

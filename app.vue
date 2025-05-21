@@ -8,12 +8,23 @@
 
 <script setup>
 import { useMenuStore } from './stores/menuStore'
+import { useAuthStore } from './stores/authStore'
+import { useRouter } from 'vue-router'
 
 const menuOpened = ref(false)
 
 const menuStore = useMenuStore()
+const authStore = useAuthStore()
+
+const router = useRouter()
 menuStore.$subscribe((mutation,state) => {
-  menuOpened.value = state.menuOpened
+  // menuOpened.value = state.menuOpened
+})
+
+onMounted(() => {
+  if(!authStore.isLoggedIn) {
+    router.push('/login')
+  }
 })
 
 useHead({

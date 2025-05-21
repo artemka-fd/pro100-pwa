@@ -18,12 +18,12 @@
             </div>
             <div class="profile__data-inputs">
                 <InputComponent
-                    placeholder="+38 (063) 111 11 11"
-                    iconSrc="/public/img/svg/icons/phone.svg"
+                    :placeholder="user.phone"
+                    iconSrc="../public/img/svg/icons/phone.svg"
                 />
                 <InputComponent
-                    placeholder="testemail@gmail.com"
-                    iconSrc="/public/img/svg/icons/phone.svg"
+                    :placeholder="user.email"
+                    iconSrc="../public/img/svg/icons/email.svg"
                 />
             </div>
         </div>
@@ -73,19 +73,31 @@
                     <path d="M3 5H4.66667M4.66667 5H18M4.66667 5L4.66667 16.6667C4.66667 17.1087 4.84226 17.5326 5.15482 17.8452C5.46738 18.1577 5.89131 18.3333 6.33333 18.3333H14.6667C15.1087 18.3333 15.5326 18.1577 15.8452 17.8452C16.1577 17.5326 16.3333 17.1087 16.3333 16.6667V5.00001M7.16667 5.00001V3.33334C7.16667 2.89131 7.34226 2.46739 7.65482 2.15483C7.96738 1.84227 8.39131 1.66667 8.83333 1.66667H12.1667C12.6087 1.66667 13.0326 1.84227 13.3452 2.15483C13.6577 2.46739 13.8333 2.89131 13.8333 3.33334V5.00001" stroke="#FF4615" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <NuxtLink to="/login" class="btn btn--primary btn--full-width">
+            <div
+                to="/login"
+                class="btn btn--primary btn--full-width"
+                @click="handleLogout"
+            >
                 <p class="label-large">Вийти</p>
                 <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 17.5H4.66667C4.22464 17.5 3.80072 17.3244 3.48816 17.0118C3.17559 16.6993 3 16.2754 3 15.8333V4.16667C3 3.72464 3.17559 3.30072 3.48816 2.98816C3.80072 2.67559 4.22464 2.5 4.66667 2.5H8M13.8333 14.1667L18 10M18 10L13.8333 5.83333M18 10H8" stroke="#F8F8FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
 
-            </NuxtLink>
+            </div>
         </div>
     </div>
 </section>
 </template>
 
 <script setup>
+import { useAuthStore } from '~/stores/authStore';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const { $auth } = useNuxtApp();
+const authStore = useAuthStore();
+const user = authStore.user
+
 const userObj = {
     profileName: {
         type: String,
@@ -99,6 +111,12 @@ const userObj = {
         type: String,
         default: 'https://placecats.com/bella/300/200'
     }
+}
+
+const handleLogout = () => {
+    $auth.signOut();
+    authStore.clearUser();
+    router.push('/login');
 }
 </script>
 

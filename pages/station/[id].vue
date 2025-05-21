@@ -42,7 +42,7 @@
             <div class="station__main__top">
                 <div class="station__main__gallery">
                     <div class="img-wrap">
-                        <!-- <img :src="station.gallery[0] ?? 'https://placecats.com/millie_neo/300/200'" alt="gallery" /> -->
+                        <img :src="station.photoUrls[0] ?? 'https://placecats.com/millie_neo/300/200'" alt="gallery" />
                     </div>
                 </div>
                 <div class="station__main__description-wrap">
@@ -61,7 +61,7 @@
                                 </clipPath>
                                 </defs>
                             </svg>     
-                            <p class="body-small">(тут буде адреса)</p>                   
+                            <p class="body-small">{{station.address}}</p>                   
                         </div>
                         <div class="station__main__info-text">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -74,7 +74,7 @@
                                 </clipPath>
                                 </defs>
                             </svg>
-                            <p class="body-small">Працює з {{ station.workingHours.friday.start }}:00</p>
+                            <p class="body-small">Працює з {{ dayOfWeek.start }}:00</p>
                         </div>
                     </div>
                     <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
@@ -88,17 +88,18 @@
                     </div>
                     <div class="station__main__schedule">
                         <h3 class="title-large">Графік роботи:</h3>
-                        <p class="body-large">{{station.scheduleBusiness}}</p>
-                        <p class="body-large">{{station.scheduleWeekend}}</p>
+                        <p class="body-large">Пн-Пт: {{ station.workingHours.monday.start }}:00 - {{ station.workingHours.monday.end }}:00</p>
+                        <p class="body-large">Сб-Нд: {{ station.workingHours.saturday.start }}:00 - {{ station.workingHours.saturday.end }}:00</p>
+                        <!-- <p class="body-large">32432</p> -->
                     </div>
                     <div class="desktop--hide btn btn--primary">Звʼязатися</div>
                     <div class="station__map">
                 </div>
             </div>
-            <!-- <MapBoxMap
-                :locations="[{lat: station.coords[0], lng: station.coords[1], imageUrl: station.imageUrl}]"
+            <MapBoxMap
+                :locations="[{lat: station.location.coordinates[1], lng: station.location.coordinates[0], imageUrl: station.photoUrls[0]}]"
                 ref="mapRef"
-            />  -->
+            /> 
             </div>
             <div class="station__main__btns">
                 <p class="label-small">
@@ -128,12 +129,30 @@ import { getStation } from '~/services/api/stations';
 import moment from 'moment';
 
 const router = useRouter()
+const dayOfWeek = ref('')
+const date = moment()
+const momentDayOfWeek = date.weekday()
 
 const { data: station, pending, error } = await useAsyncData('station', () =>
   getStation(2)
 )
 
-console.log(moment.day())
+switch (momentDayOfWeek) {
+    case 0: dayOfWeek.value = station.value.workingHours.sunday;
+            break;
+    case 1: dayOfWeek.value = station.value.workingHours.monday;
+            break;
+    case 2: dayOfWeek.value = station.value.workingHours.tuesday;
+            break;
+    case 3: dayOfWeek.value = station.value.workingHours.wednesday;
+            break;
+    case 4: dayOfWeek.value = station.value.workingHours.thursday;
+            break;
+    case 5: dayOfWeek.value = station.value.workingHours.friday;
+            break;
+    case 6: dayOfWeek.value = station.value.workingHours.saturday;
+            break;
+}
 
 // for tags
 const tagsContainer = ref(null);
@@ -178,6 +197,10 @@ onMounted(() => {
     tagsContainer.value.addEventListener('touchend', handleTouchEnd);
     handleScroll(); // Ініціалізуємо відображення градієнтів при завантаженні
   }
+
+  console.log(momentDayOfWeek);  
+  console.log(dayOfWeek.value);  
+  console.log(station.value);  
 });
 
 </script>
@@ -269,7 +292,9 @@ onMounted(() => {
             border: 0.1rem solid var(--neutrals-300);
             border-radius: var(--round-16);
             .img-wrap {
+                height: 100%;
                 img {
+                    object-fit: cover;
                     border-radius: var(--round-16);
                 }
                 position: relative;

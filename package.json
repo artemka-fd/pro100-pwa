@@ -20,6 +20,7 @@
     "@vueuse/core": "^13.0.0",
     "@vueuse/nuxt": "^13.0.0",
     "axios": "^1.9.0",
+    "firebase": "^11.7.3",
     "html2canvas": "^1.4.1",
     "maska": "^3.1.1",
     "mkcert": "^3.2.0",
@@ -27,6 +28,7 @@
     "nuxi": "^3.24.1",
     "nuxt": "^3.16.1",
     "pinia": "^3.0.2",
+    "pinia-plugin-persistedstate": "^4.3.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "vue-server-renderer": "^2.2.6"

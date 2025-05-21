@@ -43,7 +43,7 @@
         </div>
         <div class="popup__address-text">
           <p class="label-medium label-medium--time">Відкрито</p>
-          <p class="label-medium">{{ loc.time }}</p>
+          <p class="label-medium">{{ dayOfWeek.start }}:00 - {{ dayOfWeek.end }}:00</p>
         </div>
     </div>
     <div class="rating-stars">
@@ -69,7 +69,7 @@
           </svg>
         </template>
       </div>
-      <span class="count label-medium">{{ loc.totalRating }} відгуків</span>
+      <span class="count label-medium">{{ loc.averageRating }} відгуків</span>
     </div>
     <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
     <div class="popup__call">
@@ -97,6 +97,7 @@
   
 <script setup>
   import { useRouter } from 'vue-router'
+  import moment from 'moment'
   const props = defineProps({
     loc: Object
   })
@@ -106,6 +107,28 @@
   const goToStation = () => {
     router.push(`/station/${props.loc.id}`)
   }
+
+  const dayOfWeek = ref('')
+  const date = moment()
+  const momentDayOfWeek = date.weekday()
+
+  switch (momentDayOfWeek) {
+      case 0: dayOfWeek.value = props.loc.workingHours.sunday;
+              break;
+      case 1: dayOfWeek.value = props.loc.workingHours.monday;
+              break;
+      case 2: dayOfWeek.value = props.loc.workingHours.tuesday;
+              break;
+      case 3: dayOfWeek.value = props.loc.workingHours.wednesday;
+              break;
+      case 4: dayOfWeek.value = props.loc.workingHours.thursday;
+              break;
+      case 5: dayOfWeek.value = props.loc.workingHours.friday;
+              break;
+      case 6: dayOfWeek.value = props.loc.workingHours.saturday;
+              break;
+  }
+
   onMounted(() => {
     // невелика затримка для тригеру transition
     emit('mounted')

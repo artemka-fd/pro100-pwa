@@ -21,14 +21,14 @@
     </div>
     <p class="username title-large">{{ user.name }}</p>
     <nav class="menu-links">
-        <NuxtLink to="" class="title-medium">Мій профіль</NuxtLink>
+        <NuxtLink to="/profile" class="title-medium">Мій профіль</NuxtLink>
         <NuxtLink to="/" class="title-medium">СТО та пошук</NuxtLink>
-        <NuxtLink to="" class="title-medium">Про Vroom</NuxtLink>
+        <NuxtLink to="/about" class="title-medium">Про Vroom</NuxtLink>
     </nav>
     <nav class="menu-links menu-links--bottom">
-        <NuxtLink to="" class="title-medium">FAQ</NuxtLink>
-        <NuxtLink to="" class="title-medium">Terms of use</NuxtLink>
-        <NuxtLink to="" class="title-medium">Privacy policy</NuxtLink>
+        <NuxtLink to="/faq" class="title-medium">FAQ</NuxtLink>
+        <NuxtLink to="/faq" class="title-medium">Terms of use</NuxtLink>
+        <NuxtLink to="/faq" class="title-medium">Privacy policy</NuxtLink>
     </nav>
     
     <NuxtLink to="register" class="logout btn btn--transparent">
