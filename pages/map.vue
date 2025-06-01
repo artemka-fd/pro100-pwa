@@ -40,7 +40,7 @@ ListboxButton,
 ListboxOptions,
 ListboxOption,
 } from '@headlessui/vue'
-import { getStations } from '~/services/api/stations' 
+// import { getStations } from '~/services/api/stations'
 
 // dropdown
 const filters = [
@@ -52,10 +52,26 @@ const filters = [
 ]
 const selectedFilter = ref(filters[0])
 
+const getStations = async (lat, lon, tagIds) => {
+    const { $api } = useNuxtApp()
+    console.log('i\'m using this getstaations and getting undefined')
+    try {
+        const data = await $api('/service-station/find-by-criteria', {
+            method: 'POST',
+            body: {
+                latitude: lat,
+                longitude: lon,
+                tagId: tagIds ?? []
+            }
+        })
+        return data
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 // map
-const { data: stations, pending, error } = await useAsyncData('stations', () =>
-  getStations(50.4, 30.5)
-)
+// const stations = getStations(50.4, 30.5)
 // const stations = Array.from({ length: 30 }, (_, i) => ({
 //   name: Math.random().toString(),
 //   address: 'Столичне шосе, 101Г, Київ',
@@ -68,9 +84,70 @@ const { data: stations, pending, error } = await useAsyncData('stations', () =>
 //   imageUrl: 'https://placecats.com/300/200?fit=contain&position=top',
 // }))
 
+const stations = [
+    {
+    "id": 2,
+    "ownerId": 1,
+    "name": "СТО на вул. Сімʼї Хохлових",
+    "nameSlug": "sto-na-vul-simyi-khokhlovykh-02896",
+    "description": "asdfasdf",
+    "address": "asdfasdf",
+    "workingHours": {
+        "friday": {
+            "end": 17,
+            "start": 8
+        },
+        "monday": {
+            "end": 17,
+            "start": 8
+        },
+        "sunday": {
+            "end": 17,
+            "start": 8
+        },
+        "tuesday": {
+            "end": 17,
+            "start": 8
+        },
+        "saturday": {
+            "end": 17,
+            "start": 8
+        },
+        "thursday": {
+            "end": 17,
+            "start": 8
+        },
+        "wednesday": {
+            "end": 17,
+            "start": 8
+        }
+    },
+    "location": {
+        "type": "Point",
+        "coordinates": [
+            30.5234,
+            50.4501
+        ]
+    },
+    "tagId": [],
+    "photoUrls": [
+        "https://vroom.pictures.s3.us-east-1.amazonaws.com/stations/temp/d2b1782f-34b1-4184-87f4-3dfa2b43b93e/1746800699588-0.jpeg",
+        "https://vroom.pictures.s3.us-east-1.amazonaws.com/stations/temp/d2b1782f-34b1-4184-87f4-3dfa2b43b93e/1746800699590-1.png",
+        "https://vroom.pictures.s3.us-east-1.amazonaws.com/stations/temp/d2b1782f-34b1-4184-87f4-3dfa2b43b93e/1746800699590-2.png"
+    ],
+    "distance": 5.8,
+    "ratings": [],
+    "averageRating": 0
+}
+]
+
 function handleMarkerClick(location) {
   console.log('Clicked:', location)
 }
+
+onMounted(() => {
+    console.log(stations.value)
+})
 </script>
 
 <style lang="scss">

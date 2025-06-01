@@ -1,6 +1,6 @@
 <template>
 <div>
-    <SideMenu :isOpen="isOpen" @close="closeMenu" :screenshot="screenshot" />
+    <SideMenu :isOpen="isOpen" @close="closeMenu" :screenshot="screenshot" :user="{profileName: profileName, avatar: pfpSrc}" />
     <header :class="['header', 'soft-shadows-4', {'header--no-margin': currentRoute === 'map', 'header--menu-opened': menuOpened}]">
         <NuxtLink to="/profile" class="header__user">
             <div class="header__user-pfp img-wrap img-wrap--cover">

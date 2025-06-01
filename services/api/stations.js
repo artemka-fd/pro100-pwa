@@ -21,6 +21,7 @@ export const getStation = async (id) => {
 
     try {
         const data = await $api(`/service-station/${id}`)
+        console.log(data)
         return data
     } catch (error) {
         console.error(error)

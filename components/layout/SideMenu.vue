@@ -19,7 +19,7 @@
     <div class="menu-header img-wrap img-wrap--cover">
         <img class="avatar" :src="user.avatar ?? 'https://placecats.com/bella/300/200'" alt="user photo" />
     </div>
-    <p class="username title-large">{{ user.name }}</p>
+    <p class="username title-large">{{ user.profileName }}</p>
     <nav class="menu-links">
         <NuxtLink to="/profile" class="title-medium">Мій профіль</NuxtLink>
         <NuxtLink to="/" class="title-medium">СТО та пошук</NuxtLink>
@@ -49,7 +49,7 @@
         user: {
             type: Object,
             default: () => ({
-            name: 'Іван Стович',
+            profileName: 'Іван Стович',
             avatar: 'https://placecats.com/neo_2/300/200' // просто для прикладу
             })
         },

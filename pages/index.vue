@@ -110,6 +110,7 @@ const authStore = useAuthStore();
 const { data: stations, pending, error } = await useAsyncData('stations', () =>
   getStations(50.4, 30.5)
 )
+console.log(stations)
 
 onMounted(async () => {
   if (navigator.geolocation) {

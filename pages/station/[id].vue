@@ -42,7 +42,7 @@
             <div class="station__main__top">
                 <div class="station__main__gallery">
                     <div class="img-wrap">
-                        <img :src="station.photoUrls[0] ?? 'https://placecats.com/millie_neo/300/200'" alt="gallery" />
+                        <img :src="station.photoUrls[0].replace('https', 'http') ?? 'https://placecats.com/millie_neo/300/200'" alt="gallery" />
                     </div>
                 </div>
                 <div class="station__main__description-wrap">
@@ -88,18 +88,18 @@
                     </div>
                     <div class="station__main__schedule">
                         <h3 class="title-large">Графік роботи:</h3>
-                        <p class="body-large">Пн-Пт: {{ station.workingHours.monday.start }}:00 - {{ station.workingHours.monday.end }}:00</p>
-                        <p class="body-large">Сб-Нд: {{ station.workingHours.saturday.start }}:00 - {{ station.workingHours.saturday.end }}:00</p>
+                        <p class="body-large">Пн-Пт: {{ station.workingHours.monday.start }} - {{ station.workingHours.monday.end }}</p>
+                        <p class="body-large">Сб-Нд: {{ station.workingHours }} - {{ station.workingHours }}</p>
                         <!-- <p class="body-large">32432</p> -->
                     </div>
                     <div class="desktop--hide btn btn--primary">Звʼязатися</div>
-                    <div class="station__map">
                 </div>
-            </div>
-            <MapBoxMap
-                :locations="[{lat: station.location.coordinates[1], lng: station.location.coordinates[0], imageUrl: station.photoUrls[0]}]"
-                ref="mapRef"
-            /> 
+                <div class="station__map">
+                    <MapBoxMap
+                        :locations="[station]"
+                        ref="mapRef"
+                    /> 
+                </div>
             </div>
             <div class="station__main__btns">
                 <p class="label-small">
@@ -108,13 +108,13 @@
                         </svg>
                     {{ station.address }}
                 </p>
-                <!-- <a
+                <a
                     class="btn btn--primary-dark"
                     target="_blank"
-                    :href="`https://www.google.com/maps/search/?api=1&query=${station.coords[0]},${station.coords[1]}`"
+                    :href="`https://www.google.com/maps/search/?api=1&query=${station.location.coordinates[1]},${station.location.coordinates[0]}`"
                 >
                     Прокласти маршрут
-                </a> -->
+                </a>
                 <div class="mobile--hide btn btn--primary">Звʼязатися</div>
             </div>
         </div>
@@ -133,24 +133,27 @@ const dayOfWeek = ref('')
 const date = moment()
 const momentDayOfWeek = date.weekday()
 
+
+
 const { data: station, pending, error } = await useAsyncData('station', () =>
-  getStation(2)
+  getStation(router.currentRoute.value.params.id)
 )
 
+
 switch (momentDayOfWeek) {
-    case 0: dayOfWeek.value = station.value.workingHours.sunday;
+    case 0: dayOfWeek.value = station.value.workingHours.sunday ?? '';
             break;
-    case 1: dayOfWeek.value = station.value.workingHours.monday;
+    case 1: dayOfWeek.value = station.value.workingHours.monday ?? '';
             break;
-    case 2: dayOfWeek.value = station.value.workingHours.tuesday;
+    case 2: dayOfWeek.value = station.value.workingHours.tuesday ?? '';
             break;
-    case 3: dayOfWeek.value = station.value.workingHours.wednesday;
+    case 3: dayOfWeek.value = 'station.value.workingHours.wednesday' ?? '';
             break;
-    case 4: dayOfWeek.value = station.value.workingHours.thursday;
+    case 4: dayOfWeek.value = station.value.workingHours.thursday ?? '';
             break;
-    case 5: dayOfWeek.value = station.value.workingHours.friday;
+    case 5: dayOfWeek.value = station.value.workingHours.friday ?? '';
             break;
-    case 6: dayOfWeek.value = station.value.workingHours.saturday;
+    case 6: dayOfWeek.value = station.value.workingHours.saturday ?? '';
             break;
 }
 
@@ -261,11 +264,12 @@ onMounted(() => {
                 flex-direction: row-reverse;
                 justify-content: space-between;
                 align-items: center;
+                gap: 7rem;
                 .label-small {
                     margin: 0;
                 }
                 .btn {
-                    width: 34.3rem;
+                    width: 100%;
                     margin-bottom: 0 !important;
                 }
             }
@@ -362,6 +366,9 @@ onMounted(() => {
     &__map {
         margin-bottom: 2.8rem;
         box-shadow: 0px 2px 4px 0px #1B1C1D0A;
+        @media screen and (min-width: 768px) {
+            width: 100%;
+        }
         > #map {
             border-radius: var(--round-16);
             height: 34.3rem;

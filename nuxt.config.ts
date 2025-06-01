@@ -17,7 +17,7 @@ export default defineNuxtConfig({
       include: ['mapbox-gl'],
     },
     server: {
-      allowedHosts: ['ba9b-185-143-147-154.ngrok-free.app'],
+      allowedHosts: ['ad8e-185-143-147-144.ngrok-free.app '],
       https: {
         key: fs.readFileSync('./192.168.31.45-key.pem'),
         cert: fs.readFileSync('./192.168.31.45.pem')

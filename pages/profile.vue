@@ -13,7 +13,7 @@
                     <img :src="userObj.pfpSrc.default" alt="vanya">
                 </div>
                 <div class="profile__data-username img-wrap">
-                    <p class="title-large">{{ userObj.profileName.default }}</p>
+                    <p class="title-large">{{ user.name }}</p>
                 </div>
             </div>
             <div class="profile__data-inputs">
@@ -109,7 +109,7 @@ const userObj = {
     },
     pfpSrc: {
         type: String,
-        default: 'https://placecats.com/bella/300/200'
+        default: 'https://placecats.com/neo_2/300/200'
     }
 }
 

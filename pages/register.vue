@@ -52,6 +52,7 @@ import {
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { useAuthStore } from '~/stores/authStore';
 import { useNuxtApp } from 'nuxt/app';
+import { createUser } from "~/services/api/user";
 
 const {$auth} = useNuxtApp();
 const authStore = useAuthStore();
@@ -88,6 +89,9 @@ const register = async () => {
           phone: phone.value,
           email: email.value,
         });
+        const { data: userdata, pending, error } = await useAsyncData('user', () =>
+            createUser(name.value, phone.value, email.value)
+        )
         console.log("Інформація про користувача збережена у Firestore");
       } else {
         console.log("Користувач не знайдений в onAuthStateChanged");

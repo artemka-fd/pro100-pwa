@@ -4,10 +4,8 @@
             <div class="station-card__top-top">
                 <div class="station-card__top-image img-wrap">
                     <NuxtImg
-                        src="https://demo-source.imgix.net/mountains.jpg"
-                        width="600"
-                        height="400"
-                        alt="Наш Чмих"
+                        :src="logo"
+                        :alt="station.name"
                         format="webp"
                     />
                     <!-- <img :src="station.imageUrl ?? 'https://placecats.com/neo_banana/300/200'" alt="station-card" /> -->
@@ -21,7 +19,7 @@
             <div class="station-card__top-bottom">
                 <p class="title-large">{{ station.name }}</p>
                 <div class="station-card__top-bottom__info">
-                    <p class="label-medium">{{ distance.distanceKm }} км від вас</p>
+                    <p class="label-medium">{{ station.distance }} км від вас</p>
                     <svg width="88" height="16" viewBox="0 0 88 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.00016 1.33331L10.0602 5.50665L14.6668 6.17998L11.3335 9.42665L12.1202 14.0133L8.00016 11.8466L3.88016 14.0133L4.66683 9.42665L1.3335 6.17998L5.94016 5.50665L8.00016 1.33331Z" fill="#FFC211" stroke="#FFC211" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M26.0002 1.33331L28.0602 5.50665L32.6668 6.17998L29.3335 9.42665L30.1202 14.0133L26.0002 11.8466L21.8802 14.0133L22.6668 9.42665L19.3335 6.17998L23.9402 5.50665L26.0002 1.33331Z" fill="#FFC211" stroke="#FFC211" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -60,7 +58,7 @@
                     </clipPath>
                     </defs>
                 </svg>                                      
-                <p class="body-medium">Працює з {{ station.workingHours.friday.start }}:00</p>
+                <p class="body-medium">Працює з {{ station.workingHours.monday.start }}</p>
             </div>
             <TagsComponent :tags="['Ремонт двигуна', 'Заміна масла', 'Покраска']" />
             <div class="station-card__bottom__btns">
@@ -89,11 +87,6 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { getRouteFromMapbox } from "@/utils/getRoute"
-
-const distance = ref({
-    distanceKm: 0,
-})
 
 const props = defineProps({
     station: {
@@ -113,6 +106,7 @@ const router = useRouter()
 const config = useRuntimeConfig()
 
 const cardTop = ref(null)
+const logo = ref(null)
 
 const handleCardClick = () => {
     router.push(`/station/${props.station.nameSlug}`)
@@ -120,11 +114,7 @@ const handleCardClick = () => {
 
 onMounted(async () => {
     cardTop.value.style.backgroundImage = `url(${props.station.photoUrls[0].replace('https', 'http')})`
-    const user = [props.userCoords.lat, props.userCoords.lon]
-    const station = [props.station.location.coordinates[1], props.station.location.coordinates[0]]
-
-    const info = await getRouteFromMapbox(user, station, config.public.mapboxToken)
-    distance.value = info
+    logo.value = props.station.logoUrl.replace('https', 'http')
 })
 
 </script>
